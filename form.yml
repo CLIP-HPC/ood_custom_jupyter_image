@@ -29,8 +29,8 @@ attributes:
       - ["High memory (m)", "m"]
   gpu_type:
     widget: "select"
-    label: "GPU type (GPU partition only)"
-    help: "Ignored on the c and m partitions. MIG slices use far less of your fair-share than a full GPU."
+    label: "GPU type"
+    help: "GPU to request on the GPU (g) partition (one per session). MIG slices use far less of your fair-share than a full GPU. Only shown when the GPU (g) partition is selected."
     options:
       - ["NVIDIA B200 MIG slice (1g, 23 GB)", "nvidia_b200_1g.23gb"]
       - ["NVIDIA B200 (full, 180 GB)", "nvidia_b200"]

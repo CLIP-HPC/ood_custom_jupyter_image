@@ -59,6 +59,7 @@ user across all OnDemand and `salloc` sessions; partition `m` needs at least 200
 |---|---|
 | `manifest.yml` | App name and description |
 | `form.yml` | Form fields |
+| `form.js` | Shows the GPU type field only for partition g |
 | `submit.yml.erb` | Slurm options, limit checks |
 | `template/before.sh.erb` | Port, password and `jupyter_server` config |
 | `template/script.sh.erb` | Starts JupyterLab in the image |
