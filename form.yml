@@ -1,0 +1,65 @@
+---
+cluster: "cbe"
+# Limits follow the interactive QOS on CBE.next (48 CPUs, 1000 GB, 12 hours per
+# user; sessions on m need at least 200 GB). submit.yml.erb enforces them again.
+attributes:
+  container_image:
+    widget: "path_selector"
+    label: "Container image"
+    required: true
+    show_hidden: false
+    show_files: true
+    help: |
+      Apptainer image (`.sif`) with **JupyterLab 4.x** (jupyter_server 2.x) installed,
+      e.g. built with `apptainer build my-lab.sif my-lab.def`. JupyterLab, its
+      extensions and the default Python kernel all come from the image. Home,
+      /groups, /scratch, /resources and /clustertmp are mounted; GPU sessions get `--nv`.
+  working_dir:
+    widget: "path_selector"
+    label: "Root directory"
+    show_hidden: false
+    show_files: false
+    help: "Directory JupyterLab starts in; defaults to $HOME."
+  partition:
+    widget: "select"
+    label: "Partition"
+    options:
+      - ["CPU (c)", "c"]
+      - ["GPU (g)", "g"]
+      - ["High memory (m)", "m"]
+  gpu_type:
+    widget: "select"
+    label: "GPU type (GPU partition only)"
+    help: "Ignored on the c and m partitions. MIG slices use far less of your fair-share than a full GPU."
+    options:
+      - ["NVIDIA B200 MIG slice (1g, 23 GB)", "nvidia_b200_1g.23gb"]
+      - ["NVIDIA B200 (full, 180 GB)", "nvidia_b200"]
+      - ["Any available GPU", ""]
+  cores:
+    widget: "number_field"
+    label: "CPU cores"
+    value: 2
+    min: 1
+    max: 48
+  ram:
+    widget: "number_field"
+    label: "Memory (GB)"
+    value: 8
+    min: 1
+    max: 1000
+    help: "Up to 128 GB on c and g; 200-1000 GB on m."
+  bc_num_hours:
+    widget: "number_field"
+    label: "Wall time (hours)"
+    value: 1
+    min: 1
+    max: 12
+    help: "OnDemand sessions run for at most 12 hours. Use sbatch for longer work."
+form:
+  - container_image
+  - working_dir
+  - partition
+  - gpu_type
+  - cores
+  - ram
+  - bc_num_hours

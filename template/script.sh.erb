@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Start JupyterLab inside the user's Apptainer image
+IMAGE=<%= Shellwords.escape(context.container_image.to_s.strip) %>
+
+echo "[$(date +%T)] $(hostname -s): starting JupyterLab from $IMAGE"
+if [[ ! -f "$IMAGE" || ! -r "$IMAGE" ]]; then
+  echo "ERROR: container image '$IMAGE' is not a readable file on $(hostname -s)." >&2
+  exit 1
+fi
+
+# Host modules and EESSI variables must not reach the image's Python
+module purge >/dev/null 2>&1 || true
+cd "${NOTEBOOK_ROOT}"
+
+# Shared file systems that apptainer.conf doesn't mount (home and /tmp are)
+BINDS=""
+for d in /groups /scratch /resources /clustertmp; do
+  [[ -d "$d" ]] && BINDS="${BINDS:+$BINDS,}$d"
+done
+
+# GPU sessions: NVIDIA driver libraries and devices
+NV=()
+[[ -n "${CUDA_VISIBLE_DEVICES:-}" ]] && NV=(--nv)
+
+# Clean environment, plus what the session needs
+THREADS="${SLURM_CPUS_PER_TASK:-1}"
+ENVS=(
+  --env "JUPYTERLAB_WORKSPACES_DIR=${JUPYTERLAB_WORKSPACES_DIR}"
+  --env "PYTHONNOUSERSITE=1"
+  --env "OMP_NUM_THREADS=${THREADS}"
+  --env "SLURM_JOB_ID=${SLURM_JOB_ID:-}"
+  --env "SLURM_CPUS_PER_TASK=${THREADS}"
+  --env "SLURM_JOB_NODELIST=${SLURM_JOB_NODELIST:-}"
+)
+[[ -n "${CUDA_VISIBLE_DEVICES:-}" ]] && ENVS+=(--env "CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}")
+
+RUN=(apptainer exec "${NV[@]}" --cleanenv ${BINDS:+--bind "$BINDS"} "${ENVS[@]}" "$IMAGE")
+
+apptainer --version
+if ! "${RUN[@]}" jupyter lab --version; then
+  echo "ERROR: 'jupyter lab' does not run in $IMAGE. The image needs JupyterLab 4.x installed (pip install 'jupyterlab>=4')." >&2
+  exit 1
+fi
+
+set -x
+exec "${RUN[@]}" jupyter lab --config="${CONFIG_FILE}"

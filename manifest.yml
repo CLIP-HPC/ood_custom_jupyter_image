@@ -1,0 +1,11 @@
+---
+name: Jupyter (custom image)
+category: Interactive Apps
+subcategory: Servers
+role: batch_connect
+description: |
+  Launch [JupyterLab] from your own [Apptainer] image on CBE.next. The image
+  provides JupyterLab, its extensions and the kernels.
+
+  [JupyterLab]: https://jupyterlab.readthedocs.io/
+  [Apptainer]: https://apptainer.org/docs/user/latest/

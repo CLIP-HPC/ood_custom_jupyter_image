@@ -1,0 +1,33 @@
+# Port and password for the Jupyter server (helpers come from OnDemand)
+port=$(find_port ${host})
+password="$(create_passwd 16)"
+SALT="$(create_passwd 16)"
+PASSWORD_SHA1="$(echo -n "${password}${SALT}" | openssl dgst -sha1 | awk '{print $NF}')"
+
+working_dir=<%= Shellwords.escape(context.working_dir.to_s) %>
+if [[ -n "$working_dir" && -d "$working_dir" && -r "$working_dir" ]]; then
+  export NOTEBOOK_ROOT="$working_dir"
+else
+  export NOTEBOOK_ROOT="$HOME"
+fi
+
+# JupyterLab keeps its workspace (open tabs, layout) per session
+export JUPYTERLAB_WORKSPACES_DIR="$PWD"
+
+# jupyter_server 2.x configuration; OnDemand proxies /node/<host>/<port>/
+export CONFIG_FILE="${PWD}/config.py"
+(
+umask 077
+cat > "${CONFIG_FILE}" << EOL
+c.ServerApp.ip = '0.0.0.0'
+c.ServerApp.port = ${port}
+c.ServerApp.port_retries = 0
+c.ServerApp.base_url = '/node/${host}/${port}/'
+c.ServerApp.root_dir = '${NOTEBOOK_ROOT}'
+c.ServerApp.open_browser = False
+c.ServerApp.allow_origin = '*'
+c.ServerApp.disable_check_xsrf = True
+c.PasswordIdentityProvider.hashed_password = 'sha1:${SALT}:${PASSWORD_SHA1}'
+c.IdentityProvider.token = ''
+EOL
+)

@@ -1,0 +1,30 @@
+<%-
+  # Values can be stale or hand-edited: enforce the CBE.next limits again here
+  gpu_spec = (gpu_type.to_s =~ /\A[A-Za-z0-9_.\-]+\z/) ? "#{gpu_type}:1" : "1"
+  part     = %w[c g m].include?(partition.to_s) ? partition.to_s : "c"
+  ncores   = [[cores.to_i, 1].max, 48].min
+  mem_gb   = [[ram.to_i, 1].max, 1000].min
+  mem_gb   = [mem_gb, 200].max if part == "m"
+  hours    = bc_num_hours.to_i
+  raise ArgumentError, "OnDemand sessions can run for at most 12 hours; use sbatch for longer work." if hours > 12
+  raise ArgumentError, "Choose an Apptainer image (.sif) in 'Container image'." if container_image.to_s.strip.empty?
+-%>
+---
+batch_connect:
+  template: "basic"
+script:
+  job_name: "ood-jupyter-image"
+  native:
+    - "--wckey=ood_jupyter-image"
+    - "--partition"
+    - "<%= part %>"
+    - "--ntasks"
+    - "1"
+    - "--cpus-per-task"
+    - "<%= ncores %>"
+    - "--mem"
+    - "<%= mem_gb %>G"
+<%- if part == "g" -%>
+    - "--gpus-per-task"
+    - "<%= gpu_spec %>"
+<%- end -%>
