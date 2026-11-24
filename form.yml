@@ -10,7 +10,7 @@ attributes:
     show_hidden: false
     show_files: true
     help: |
-      Apptainer image (`.sif`) with **JupyterLab 4.x** (jupyter_server 2.x) installed,
+      Apptainer image (`.sif`) with **JupyterLab 4.x or 3.x** (jupyter_server 2.x or 1.x) installed,
       e.g. built with `apptainer build my-lab.sif my-lab.def`. JupyterLab, its
       extensions and the default Python kernel all come from the image. Home,
       /groups, /scratch, /resources and /clustertmp are mounted; GPU sessions get `--nv`.

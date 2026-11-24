@@ -14,7 +14,7 @@ fi
 # JupyterLab keeps its workspace (open tabs, layout) per session
 export JUPYTERLAB_WORKSPACES_DIR="$PWD"
 
-# jupyter_server 2.x configuration; OnDemand proxies /node/<host>/<port>/
+# jupyter_server configuration (1.x and 2.x); OnDemand proxies /node/<host>/<port>/
 export CONFIG_FILE="${PWD}/config.py"
 (
 umask 077
@@ -29,5 +29,8 @@ c.ServerApp.allow_origin = '*'
 c.ServerApp.disable_check_xsrf = True
 c.PasswordIdentityProvider.hashed_password = 'sha1:${SALT}:${PASSWORD_SHA1}'
 c.IdentityProvider.token = ''
+# jupyter_server 1.x (JupyterLab 3) ignores the two lines above; 2.x accepts these too
+c.ServerApp.password = 'sha1:${SALT}:${PASSWORD_SHA1}'
+c.ServerApp.token = ''
 EOL
 )

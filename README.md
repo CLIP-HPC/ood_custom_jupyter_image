@@ -20,7 +20,7 @@ Reload the OnDemand portal and open **Develop** (the `</>` icon) >
 
 ## Image requirements
 
-- **JupyterLab 4.x** with **jupyter_server 2.x**, with `jupyter` on the image's
+- **JupyterLab 4.x** (jupyter_server 2.x; 3.x with jupyter_server 1.x also works), with `jupyter` on the image's
   `PATH` (`apptainer exec image.sif jupyter lab --version` must work).
 - Anything else you need (packages, extensions, kernels) installed in the image.
   JupyterHub and batchspawner are **not** needed.

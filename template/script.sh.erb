@@ -38,7 +38,7 @@ RUN=(apptainer exec "${NV[@]}" --cleanenv ${BINDS:+--bind "$BINDS"} "${ENVS[@]}"
 
 apptainer --version
 if ! "${RUN[@]}" jupyter lab --version; then
-  echo "ERROR: 'jupyter lab' does not run in $IMAGE. The image needs JupyterLab 4.x installed (pip install 'jupyterlab>=4')." >&2
+  echo "ERROR: 'jupyter lab' does not run in $IMAGE. The image needs JupyterLab 3.x or 4.x installed (pip install 'jupyterlab>=4' for a new image)." >&2
   exit 1
 fi
 
